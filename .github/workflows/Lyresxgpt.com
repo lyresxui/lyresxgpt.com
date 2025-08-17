@@ -61,7 +61,11 @@ async function sendMessage() {
         const data = await response.json();
         const reply = data?.choices?.[0]?.message?.content || "Üzgünüm, şu an cevap veremiyorum.";
         addMessage(reply, 'bot');
-        speechSynthesis.speak(new SpeechSynthesisUtterance(reply));
+
+        const utter = new SpeechSynthesisUtterance(reply);
+        utter.lang = 'tr-TR';
+        speechSynthesis.speak(utter);
+
     } catch (err) {
         console.error(err);
         addMessage("API ile bağlantı kurulamadı.", 'bot');
@@ -71,6 +75,7 @@ async function sendMessage() {
 async function generateImage() {
     const userPrompt = window.prompt("Görsel için açıklama yazın:");
     if(!userPrompt) return;
+
     addMessage("Görsel üretiliyor...", 'bot');
 
     try {
@@ -86,7 +91,8 @@ async function generateImage() {
                 size:"512x512"
             })
         });
-        const img_url = response && (await response.json())?.data?.[0]?.url;
+        const data = await response.json();
+        const img_url = data?.data?.[0]?.url;
         if(img_url) addMessage("Görsel hazır: " + img_url, 'bot');
         else addMessage("Görsel üretilemedi.", 'bot');
     } catch (err) {
